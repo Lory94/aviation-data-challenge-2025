@@ -1,7 +1,11 @@
 [project]
 name = "prc-challenge-2025"
 version = "0.1.0"
-description = "Add your description here"
+description = "ENX's contribution to EC's 2025 challenge"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []
+requires-python = ">=3.13"
+dependencies = [
+    "pandas>=2.3.3",
+    "skore>=0.11.1",
+    "skrub>=0.6.2",
+]

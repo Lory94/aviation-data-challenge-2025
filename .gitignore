@@ -1,2 +1,13 @@
-data
+# uv-related
+.venv
 .python-version
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Environment
+.env
+
+# Data
+data
+
