@@ -1,4 +1,4 @@
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import root_mean_squared_error
 from ..data.SupervisedTabularDataset import SupervisedTabularDataset
 from ..utils import load_objects_from_config
 from sklearn.pipeline import Pipeline
