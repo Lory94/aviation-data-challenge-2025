@@ -5,11 +5,15 @@ description = "ENX's contribution to EC's 2025 challenge"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "catboost>=1.2.8",
+    "duckdb>=1.4.1",
     "fastparquet>=2024.11.0",
     "ipykernel>=7.1.0",
     "lightgbm>=4.6.0",
     "matplotlib>=3.10.7",
+    "mlflow>=3.5.1",
     "optuna>=4.5.0",
+    "optuna-integration>=4.5.0",
     "pandas>=2.3.3",
     "skore>=0.11.1",
     "skrub>=0.6.2",
