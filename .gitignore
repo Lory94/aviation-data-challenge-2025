@@ -9,5 +9,5 @@ __pycache__/
 .env
 
 # Data
-data
-
+/data
+*.parquet
