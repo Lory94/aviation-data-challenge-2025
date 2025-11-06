@@ -13,6 +13,14 @@ uv venv
 ```
 You can now select the environment related to the project in VS Code.
 
+#### Accessing the data
+
+```bash
+export ACCESS_KEY=xxxxxxxxxxxxxxxx
+export SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+bash load_data.sh
+```
+
 ### Adding a new dependency
 
 ```bash
