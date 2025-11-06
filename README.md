@@ -60,7 +60,7 @@ Competition runs in two phases:
 
 Ranking based on `fuel_rank_submission.parquet`: file available, with columns `idx`, `flight_id`, `start` and `end` before `fuel_kg`. Column `fuel_kg` is set to 0. The values must be replaced with our predictions (for *every* row).
 
-The file must be named `<team-name>_v<incremental integer>.parquet` and submitted to our S3 bucket (using Minio: see Accessing the data, above).
+The file must be named `<team-name>_v<incremental integer>.parquet` and submitted to our S3 bucket (using Minio: see Accessing the data, above, and [last year's challenge instructions](https://ansperformance.eu/study/data-challenge/dc2024/data.html#using-minio-client)).
 
 ### Phase 2
 
