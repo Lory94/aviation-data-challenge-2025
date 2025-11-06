@@ -1,5 +1,5 @@
 from sklearn.metrics import mean_squared_error
-from ..data.SupervisedDataset import SupervisedDataset
+from ..data.SupervisedTabularDataset import SupervisedTabularDataset
 from ..utils import load_objects_from_config
 from sklearn.pipeline import Pipeline
 
@@ -14,7 +14,7 @@ class SupervisedRegression(object):
 
     def __init__(
         self,
-        supervised_dataset:SupervisedDataset,
+        supervised_dataset: SupervisedTabularDataset,
     ):
         self.train_X = supervised_dataset.train_X
         self.train_Y = supervised_dataset.train_Y
