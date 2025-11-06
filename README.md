@@ -35,7 +35,11 @@ If uv can't manage to find a proper version of the package because of current de
 
 ### Splitting the data
 
-Split the data with the `split.py` script.
+Split the data with the `split.py` script, e.g. for an 80-20 split with the default seed (0) and target location (`split/`):
+
+```python
+python scripts/split.py 0.8
+```
 
 Run
 
@@ -44,5 +48,22 @@ python scripts/split.py -h
 ```
 
 to check the options
+
+## Submission
+
+Competition runs in two phases:
+
+- phase 1 until 9 Nov 2025 (23:59)
+- phase 2 from 10 Nov to 30 Nov 2025
+
+### Phase 1
+
+Ranking based on `fuel_rank_submission.parquet`: file available, with columns `idx`, `flight_id`, `start` and `end` before `fuel_kg`. Column `fuel_kg` is set to 0. The values must be replaced with our predictions (for *every* row).
+
+The file must be named `<team-name>_v<incremental integer>.parquet` and submitted to our S3 bucket (using Minio: see Accessing the data, above).
+
+### Phase 2
+
+Ranking based on `fuel_final_submission.parquet` (not yet available).
 
 # Architecture of the repo
