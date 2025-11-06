@@ -1,10 +1,10 @@
 import pandas as pd
 from sklearn.metrics import root_mean_squared_error
-
 from ..data import SupervisedTabularDataset, TabularDataset
 from ..utils.load_object_in_file import load_object_in_file
 from ..utils.split_dataset import split_train_val
 from .SupervisedRegression import SupervisedRegression
+from sklearn.metrics import root_mean_squared_error
 
 
 class PrcChallenge(SupervisedRegression):
@@ -51,7 +51,7 @@ class PrcChallenge(SupervisedRegression):
                 object_name=config["model"][0],
             )(**config["model"][1]),
         }
-
+    
     def solve_using(self, config):
 
         train_fuel_X, train_enrichment = self.train_fuel_X, self.train_enrichment
