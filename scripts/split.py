@@ -2,7 +2,19 @@ import argparse
 from pathlib import Path
 
 
-def split_train_val(train_frac: float, target: str, seed: int = 0):
+def split_train_val(train_frac: float, flightlist, fuel, seed: int = 0):
+    assert 0 < train_frac < 1
+
+    flightlist_train = flightlist.sample(frac=train_frac, random_state=seed)
+    flightlist_val = flightlist[~flightlist.index.isin(flightlist_train.index)]
+
+    fuel_train = fuel[fuel["flight_id"].isin(flightlist_train["flight_id"])]
+    fuel_val = fuel[fuel["flight_id"].isin(flightlist_val["flight_id"])]
+
+    return flightlist_train, flightlist_val, fuel_train, fuel_val
+
+
+def main(train_frac: float, target: str, seed: int = 0):
     assert 0 < train_frac < 1
     target = Path(target)
 
@@ -13,8 +25,9 @@ def split_train_val(train_frac: float, target: str, seed: int = 0):
     flightlist = pd.read_parquet("data/flightlist_train.parquet")
     fuel = pd.read_parquet("data/fuel_train.parquet")
 
-    flightlist_train = flightlist.sample(frac=train_frac, random_state=seed)
-    flightlist_val = flightlist[~flightlist.index.isin(flightlist_train.index)]
+    flightlist_train, flightlist_val, fuel_train, fuel_val = split_train_val(
+        train_frac=train_frac, flightlist=flightlist, fuel=fuel, seed=seed
+    )
 
     print(f"Split flight list ({len(flightlist)}) into:")
     print(
@@ -23,9 +36,6 @@ def split_train_val(train_frac: float, target: str, seed: int = 0):
     print(
         f" - val: {len(flightlist_val)} ({len(flightlist_val) / len(flightlist):.1%})"
     )
-
-    fuel_train = fuel[fuel["flight_id"].isin(flightlist_train["flight_id"])]
-    fuel_val = fuel[fuel["flight_id"].isin(flightlist_val["flight_id"])]
 
     print(f"Split fuel data ({len(fuel)}) into:")
     print(f" - train: {len(fuel_train)} ({len(fuel_train) / len(fuel):.1%})")
@@ -67,4 +77,4 @@ if __name__ == "__main__":
 
     Path(args.target).mkdir(parents=True, exist_ok=True)
 
-    split_train_val(train_frac=args.train_frac, target=args.target, seed=args.seed)
+    main(train_frac=args.train_frac, target=args.target, seed=args.seed)
