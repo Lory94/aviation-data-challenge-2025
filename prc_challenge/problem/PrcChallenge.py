@@ -3,14 +3,14 @@ from sklearn.metrics import root_mean_squared_error
 from ..data import SupervisedTabularDataset, TabularDataset
 from ..utils.load_object_in_file import load_object_in_file
 from ..utils.split_dataset import split_train_val
-from .SupervisedRegression import SupervisedRegression
 from sklearn.metrics import root_mean_squared_error
 import datetime
 import os
 import json
+from typing import Dict
 
 
-class PrcChallenge(SupervisedRegression):
+class PrcChallenge(object):
 
     def __init__(
         self,
@@ -31,7 +31,15 @@ class PrcChallenge(SupervisedRegression):
         self.test_enrichment = valid_flights
 
     @classmethod
-    def load_config(cls, config):
+    def load_config(cls, config: Dict) -> Dict:
+        """_summary_
+
+        Args:
+            config (Dict): _description_
+
+        Returns:
+            Dict: _description_
+        """
 
         return {
             "cleaning": [
@@ -60,7 +68,7 @@ class PrcChallenge(SupervisedRegression):
     def solve_using(self, config):
 
         run_seed = self.seed
-        run_timestamp = datetime.now().strftime()
+        run_timestamp = datetime.datetime.now().strftime()
         model = f"{config['model'][0]}({config['model'][1]})"
         run_name = f"{run_seed}_{run_timestamp}_{model}"
 
@@ -82,10 +90,10 @@ class PrcChallenge(SupervisedRegression):
 
         evaluation = self.evaluate(model)
 
-        os.makedirs("../../results", exist_ok=True)
-        with open("../../results/config.json", 'w') as fp:
+        os.makedirs("../../results/{run_name}", exist_ok=True)
+        with open("../../results/{run_name}/config.json", 'w') as fp:
             json.dump(config, fp)
-        with open("../../results/evaluation.json", 'w') as fp:
+        with open("../../results/{run_name}/evaluation.json", 'w') as fp:
             json.dump(evaluation, fp)
 
         return model, evaluation
