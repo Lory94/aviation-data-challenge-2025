@@ -67,3 +67,11 @@ The file must be named `<team-name>_v<incremental integer>.parquet` and submitte
 Ranking based on `fuel_final_submission.parquet` (not yet available).
 
 # Architecture of the repo
+
+# Submissions
+
+Euranova team: outspoken-tornado
+
+## Phase 1 submissions
+
+1. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (20 iter), trained on 70% of the train set - score: 277.1618
