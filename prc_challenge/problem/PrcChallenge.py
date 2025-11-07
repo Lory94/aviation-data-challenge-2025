@@ -8,27 +8,37 @@ import datetime
 import os
 import json
 from typing import Dict
+import types
+from ..data.assets import get_FuelSegment, get_Airport, get_FlightList, get_Flight
 
 
 class PrcChallenge(object):
 
     def __init__(
         self,
-        supervised_fuel_dataset: SupervisedTabularDataset,
-        enrichment_dataset: TabularDataset,
         seed: int,
     ):
+        
+        train_FuelSegment = get_FuelSegment(variant="train")
+        train_FlightList = get_FlightList(variant="train")
+        self.Airport = get_Airport()
+        self.Flight = get_Flight(variant="train")
 
-        train_flights, valid_flights, train_fuel, valid_fuel = split_train_val(
-            0.8, enrichment_dataset, supervised_fuel_dataset, seed=seed,
+        (self.train_FlightList, 
+         self.valid_FlightList, 
+         train_FuelSegment, 
+         valid_FuelSegment,
+        ) = split_train_val(
+            train_frac=0.8, 
+            flightlist=train_FlightList, 
+            fuel=train_FuelSegment, 
+            seed=seed,
         )
         self.seed = seed
-        self.train_fuel_X = train_fuel.drop(columns=["fuel_kg"])
-        self.train_fuel_Y = train_fuel["fuel_kg"]
-        self.test_fuel_X = valid_fuel.drop(columns=["fuel_kg"])
-        self.test_fuel_Y = valid_fuel["fuel_kg"]
-        self.train_enrichment = train_flights
-        self.test_enrichment = valid_flights
+        self.train_FuelSegment_X = train_FuelSegment.drop(columns=["fuel_kg"])
+        self.train_FuelSegment_Y = train_FuelSegment["fuel_kg"]
+        self.test_FuelSegment_X = valid_FuelSegment.drop(columns=["fuel_kg"])
+        self.test_FuelSegment_Y = valid_FuelSegment["fuel_kg"]
 
     @classmethod
     def load_config(cls, config: Dict) -> Dict:
@@ -72,23 +82,29 @@ class PrcChallenge(object):
         model = f"{config['model'][0]}({config['model'][1]})"
         run_name = f"{run_seed}_{run_timestamp}_{model}"
 
+        # config contains the string version of the configuration of the run
+        # loaded_config is its counterpart where associated objects are loaded and instanciated
         loaded_config = self.load_config(config)
 
-        train_fuel_X, train_enrichment = self.train_fuel_X, self.train_enrichment
-
         for cleaning_step in loaded_config["cleaning"]:
-            train_fuel_X, train_enrichment = cleaning_step(
-                train_fuel_X, train_enrichment,
+            if not isinstance(cleaning_step, types.FunctionType) and hasattr(cleaning_step, "fit"):
+                cleaning_step.fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight)
+            self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight = cleaning_step(
+                self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight,
             )
 
         for feature_engineering_step in loaded_config["feature_engineering"]:
-            train_fuel_X, train_enrichment = feature_engineering_step(
-                train_fuel_X, train_enrichment,
+            if not isinstance(feature_engineering_step, types.FunctionType) and hasattr(feature_engineering_step, "fit"):
+                feature_engineering_step.fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight)
+            self.train_FuelSegment_X = feature_engineering_step(
+                self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight,
             )
 
-        model = config["model"].fit(train_fuel_X, train_enrichment)
+        loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y)
 
-        evaluation = self.evaluate(model)
+        evaluation = self.evaluate(
+            loaded_config["model"],
+        )
 
         os.makedirs("../../results/{run_name}", exist_ok=True)
         with open("../../results/{run_name}/config.json", 'w') as fp:
@@ -106,19 +122,21 @@ class PrcChallenge(object):
         metrics = {}
 
         # Train RMSE
-        y_pred = model.predict(self.train_fuel_X)
-        y_true = self.train_fuel_Y
+        y_pred = model.predict(self.train_FuelSegment_X)
+        y_true = self.train_FuelSegment_Y
         metrics["mse(test)"] = root_mean_squared_error(y_pred=y_pred, y_true=y_true)
 
         # Test RMSE
-        y_pred = model.predict(self.test_fuel_X)
-        y_true = self.test_fuel_Y
+        y_pred = model.predict(self.test_FuelSegment_X)
+        y_true = self.test_FuelSegment_Y
         metrics["rmse(test)"] = root_mean_squared_error(y_pred=y_pred, y_true=y_true)
 
         return metrics
 
-    def predict_for_submission(
-        self, model, ranking_dataframe: pd.DataFrame
+    def build_submission(
+        self, 
+        model, 
+        ranking_dataframe: pd.DataFrame
     ) -> pd.DataFrame:
         assert set(ranking_dataframe.columns) == {
             "idx",
