@@ -29,7 +29,7 @@ def collect_experiments(results_dir='results'):
 
         with open(metrics_path, 'r') as f:
             metrics = json.load(f)
-            rmse = metrics.get('rmse(test)')
+            rmse = metrics.get('rmse(valid)')
             if rmse is None:
                 continue  # Skip if RMSE not found
         with open(config_path, 'r') as f:
