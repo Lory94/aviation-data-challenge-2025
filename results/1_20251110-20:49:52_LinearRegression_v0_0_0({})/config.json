@@ -1,0 +1,22 @@
+{
+    "cleaning": [],
+    "feature_engineering": [
+        [
+            "AddAircraftType_v0_0_0",
+            {}
+        ],
+        [
+            "DropIfExists_v0_0_0",
+            {
+                "columns": [
+                    "idx",
+                    "flight_id"
+                ]
+            }
+        ]
+    ],
+    "model": [
+        "LinearRegression_v0_0_0",
+        {}
+    ]
+}
