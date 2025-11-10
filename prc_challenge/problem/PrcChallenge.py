@@ -88,10 +88,15 @@ class PrcChallenge(object):
         run_timestamp = datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S")
         model = f"{config['model'][0]}({config['model'][1]})"
         run_name = f"{run_seed}_{run_timestamp}_{model}"
+        os.makedirs(f"../../results/{run_name}", exist_ok=True)
 
         # config contains the string version of the configuration of the run
         # loaded_config is its counterpart where associated objects are loaded and instanciated
         loaded_config = self.load_config(config)
+
+        print("Available features before any processing:")
+        print(self.train_FuelSegment_X.dtypes)
+        print()
 
         for cleaning_step in loaded_config["cleaning"]:
             if not isinstance(cleaning_step, types.FunctionType) and hasattr(cleaning_step, "fit"):
@@ -100,12 +105,20 @@ class PrcChallenge(object):
                 self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight,
             )
 
+        print("Available features after cleanup:")
+        print(self.train_FuelSegment_X.dtypes)
+        print()
+
         for feature_engineering_step in loaded_config["feature_engineering"]:
             if not isinstance(feature_engineering_step, types.FunctionType) and hasattr(feature_engineering_step, "fit"):
                 feature_engineering_step.fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight)
             self.train_FuelSegment_X, self.column_functions = feature_engineering_step(
                 self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight, self.column_functions,
             )
+
+        print("Available features after feature engineering:")
+        print(self.train_FuelSegment_X.dtypes)
+        print()
 
         loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.column_functions)
 
@@ -114,7 +127,6 @@ class PrcChallenge(object):
             loaded_config["model"],
         )
 
-        os.makedirs(f"../../results/{run_name}", exist_ok=True)
         with open(f"../../results/{run_name}/config.json", 'w') as fp:
             json.dump(config, fp, indent=4)
         with open(f"../../results/{run_name}/evaluation.json", 'w') as fp:
