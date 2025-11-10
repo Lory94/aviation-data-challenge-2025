@@ -100,9 +100,11 @@ class PrcChallenge(object):
 
         for cleaning_step in loaded_config["cleaning"]:
             if not isinstance(cleaning_step, types.FunctionType) and hasattr(cleaning_step, "fit"):
-                cleaning_step.fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight)
+                cleaning_step.fit(
+                    self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight, **step_kwargs,
+                )
             self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight = cleaning_step(
-                self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight,
+                self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight, **step_kwargs,
             )
 
         print("Available features after cleanup:")
@@ -110,8 +112,9 @@ class PrcChallenge(object):
         print()
 
         for feature_engineering_step in loaded_config["feature_engineering"]:
-            if not isinstance(feature_engineering_step, types.FunctionType) and hasattr(feature_engineering_step, "fit"):
-                feature_engineering_step.fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight)
+            feature_engineering_step.fit(
+                self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight,
+            )
             self.train_FuelSegment_X, self.column_functions = feature_engineering_step(
                 self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight, self.column_functions,
             )
@@ -122,7 +125,6 @@ class PrcChallenge(object):
 
         loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.column_functions)
 
-        print(loaded_config["model"])
         evaluation = self.evaluate(
             loaded_config["model"],
         )
