@@ -1,31 +1,29 @@
-from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.linear_model import LinearRegression as SklearnLinearRegression
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
 
-class LinearRegression_v0_0_0(BaseEstimator, RegressorMixin):
+
+class LinearRegression_v0_0_0(object):
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         super().__init__()
 
-    def fit(self, X, y):
-
-        print(self.kwargs)
+    def fit(self, X, y, column_functions):
 
         preprocessing = ColumnTransformer(
             [
                 (
                     'imputation', 
                     SimpleImputer(strategy='mean'), 
-                    self.kwargs["interval_numeric"]+self.kwargs["ratio_numeric"],
+                    column_functions["numerical"],
                 ),
                 (
                     'category_encoding', 
                     OneHotEncoder(handle_unknown='ignore', sparse_output=False), 
-                    self.kwargs["nominal_category"]+self.kwargs["ordinal_category"],
+                    column_functions["categorical"],
                 ),
             ],
             remainder='drop',
@@ -38,7 +36,6 @@ class LinearRegression_v0_0_0(BaseEstimator, RegressorMixin):
         ])
 
         self.pipeline = self.pipeline.fit(X=X, y=y)
-        return self
 
     def predict(self, X):
         return self.pipeline.predict(X)
