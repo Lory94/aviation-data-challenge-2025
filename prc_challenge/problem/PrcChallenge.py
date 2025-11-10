@@ -37,8 +37,8 @@ class PrcChallenge(object):
         self.seed = seed
         self.train_FuelSegment_X = train_FuelSegment.drop(columns=["fuel_kg"])
         self.train_FuelSegment_Y = train_FuelSegment["fuel_kg"]
-        self.test_FuelSegment_X = valid_FuelSegment.drop(columns=["fuel_kg"])
-        self.test_FuelSegment_Y = valid_FuelSegment["fuel_kg"]
+        self.valid_FuelSegment_X = valid_FuelSegment.drop(columns=["fuel_kg"])
+        self.valid_FuelSegment_Y = valid_FuelSegment["fuel_kg"]
         self.column_functions = {
             "timestamp": ["start", "end"],
             "incremental_identifier": ["idx"],
@@ -92,13 +92,13 @@ class PrcChallenge(object):
 
         # config contains the string version of the configuration of the run
         # loaded_config is its counterpart where associated objects are loaded and instanciated
-        loaded_config = self.load_config(config)
+        self.loaded_config = self.load_config(config)
 
         print("Available features before any processing:")
         print(self.train_FuelSegment_X.dtypes)
         print()
 
-        for cleaning_step in loaded_config["cleaning"]:
+        for cleaning_step in self.loaded_config["cleaning"]:
             if not isinstance(cleaning_step, types.FunctionType) and hasattr(cleaning_step, "fit"):
                 cleaning_step.fit(
                     self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight, **step_kwargs,
@@ -111,7 +111,7 @@ class PrcChallenge(object):
         print(self.train_FuelSegment_X.dtypes)
         print()
 
-        for feature_engineering_step in loaded_config["feature_engineering"]:
+        for feature_engineering_step in self.loaded_config["feature_engineering"]:
             feature_engineering_step.fit(
                 self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight,
             )
@@ -123,10 +123,10 @@ class PrcChallenge(object):
         print(self.train_FuelSegment_X.dtypes)
         print()
 
-        loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.column_functions)
+        self.loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.column_functions)
 
         evaluation = self.evaluate(
-            loaded_config["model"],
+            self.loaded_config["model"],
         )
 
         with open(f"../../results/{run_name}/config.json", 'w') as fp:
@@ -146,12 +146,20 @@ class PrcChallenge(object):
         # Train RMSE
         y_pred = model.predict(self.train_FuelSegment_X)
         y_true = self.train_FuelSegment_Y
-        metrics["mse(test)"] = root_mean_squared_error(y_pred=y_pred, y_true=y_true)
+        metrics["mse(train)"] = root_mean_squared_error(y_pred=y_pred, y_true=y_true)
 
         # Test RMSE
-        y_pred = model.predict(self.test_FuelSegment_X)
-        y_true = self.test_FuelSegment_Y
-        metrics["rmse(test)"] = root_mean_squared_error(y_pred=y_pred, y_true=y_true)
+        for cleaning_step in self.loaded_config["cleaning"]:
+            self.valid_FuelSegment_X, self.valid_FlightList, self.Airport, self.Flight = cleaning_step(
+                self.valid_FuelSegment_X, self.valid_FlightList, self.Airport, self.Flight,
+            )
+        for feature_engineering_step in self.loaded_config["feature_engineering"]:
+            self.valid_FuelSegment_X, _ = feature_engineering_step(
+                self.valid_FuelSegment_X, None, self.valid_FlightList, self.Airport, self.Flight, self.column_functions,
+            )
+        y_pred = model.predict(self.valid_FuelSegment_X)
+        y_true = self.valid_FuelSegment_Y
+        metrics["rmse(valid)"] = root_mean_squared_error(y_pred=y_pred, y_true=y_true)
 
         return metrics
 
