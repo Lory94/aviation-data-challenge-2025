@@ -1,5 +1,0 @@
-{
-    "problem": "PrcChallenge",
-    "feature_engineering": "Todo_0_0_0",
-    "model": "FeaturesToNumericalThenLinearRegression_0_0_0"
-}

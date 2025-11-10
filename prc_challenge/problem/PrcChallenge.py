@@ -39,6 +39,13 @@ class PrcChallenge(object):
         self.train_FuelSegment_Y = train_FuelSegment["fuel_kg"]
         self.test_FuelSegment_X = valid_FuelSegment.drop(columns=["fuel_kg"])
         self.test_FuelSegment_Y = valid_FuelSegment["fuel_kg"]
+        self.column_functions = {
+            "timestamp": ["start", "end"],
+            "incremental_identifier": ["idx"],
+            "identifier": ["flight_id"],
+            "numerical": [],
+            "categorical": [],
+        }
 
     @classmethod
     def load_config(cls, config: Dict) -> Dict:
@@ -78,7 +85,7 @@ class PrcChallenge(object):
     def solve_using(self, config):
 
         run_seed = self.seed
-        run_timestamp = datetime.datetime.now().strftime()
+        run_timestamp = datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S")
         model = f"{config['model'][0]}({config['model'][1]})"
         run_name = f"{run_seed}_{run_timestamp}_{model}"
 
@@ -96,21 +103,22 @@ class PrcChallenge(object):
         for feature_engineering_step in loaded_config["feature_engineering"]:
             if not isinstance(feature_engineering_step, types.FunctionType) and hasattr(feature_engineering_step, "fit"):
                 feature_engineering_step.fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight)
-            self.train_FuelSegment_X = feature_engineering_step(
-                self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight,
+            self.train_FuelSegment_X, self.column_functions = feature_engineering_step(
+                self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight, self.column_functions,
             )
 
-        loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y)
+        loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.column_functions)
 
+        print(loaded_config["model"])
         evaluation = self.evaluate(
             loaded_config["model"],
         )
 
-        os.makedirs("../../results/{run_name}", exist_ok=True)
-        with open("../../results/{run_name}/config.json", 'w') as fp:
-            json.dump(config, fp)
-        with open("../../results/{run_name}/evaluation.json", 'w') as fp:
-            json.dump(evaluation, fp)
+        os.makedirs(f"../../results/{run_name}", exist_ok=True)
+        with open(f"../../results/{run_name}/config.json", 'w') as fp:
+            json.dump(config, fp, indent=4)
+        with open(f"../../results/{run_name}/evaluation.json", 'w') as fp:
+            json.dump(evaluation, fp, indent=4)
 
         return model, evaluation
 

@@ -1,0 +1,8 @@
+{
+    "cleaning": [],
+    "feature_engineering": [],
+    "model": [
+        "TrainSetMean_v0_0_0",
+        {}
+    ]
+}
