@@ -19,8 +19,8 @@ class PrcChallenge(object):
         seed: int,
     ):
         
-        train_FuelSegment = get_FuelSegment(variant="train")
-        train_FlightList = get_FlightList(variant="train")
+        FuelSegment = get_FuelSegment(variant="train")
+        FlightList = get_FlightList(variant="train")
         self.Airport = get_Airport()
         self.Flight = get_Flight(variant="train")
 
@@ -30,8 +30,8 @@ class PrcChallenge(object):
          valid_FuelSegment,
         ) = split_train_val(
             train_frac=0.8, 
-            flightlist=train_FlightList, 
-            fuel=train_FuelSegment, 
+            flightlist=FlightList, 
+            fuel=FuelSegment, 
             seed=seed,
         )
         self.seed = seed
@@ -87,8 +87,8 @@ class PrcChallenge(object):
         run_seed = self.seed
         run_timestamp = datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S")
         model = f"{config['model'][0]}({config['model'][1]})"
-        run_name = f"{run_seed}_{run_timestamp}_{model}"
-        os.makedirs(f"../../results/{run_name}", exist_ok=True)
+        self.run_name = f"{run_seed}_{run_timestamp}_{model}"
+        os.makedirs(f"../../results/{self.run_name}", exist_ok=True)
 
         # config contains the string version of the configuration of the run
         # loaded_config is its counterpart where associated objects are loaded and instanciated
@@ -101,10 +101,10 @@ class PrcChallenge(object):
         for cleaning_step in self.loaded_config["cleaning"]:
             if not isinstance(cleaning_step, types.FunctionType) and hasattr(cleaning_step, "fit"):
                 cleaning_step.fit(
-                    self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight, **step_kwargs,
+                    self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight,
                 )
             self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight = cleaning_step(
-                self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight, **step_kwargs,
+                self.train_FuelSegment_X, self.train_FlightList, self.Airport, self.Flight,
             )
 
         print("Available features after cleanup:")
@@ -112,9 +112,6 @@ class PrcChallenge(object):
         print()
 
         for feature_engineering_step in self.loaded_config["feature_engineering"]:
-            feature_engineering_step.fit(
-                self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight,
-            )
             self.train_FuelSegment_X, self.column_functions = feature_engineering_step(
                 self.train_FuelSegment_X, self.train_FuelSegment_Y, self.train_FlightList, self.Airport, self.Flight, self.column_functions,
             )
@@ -123,15 +120,19 @@ class PrcChallenge(object):
         print(self.train_FuelSegment_X.dtypes)
         print()
 
+        print("Starting training...")
         self.loaded_config["model"].fit(self.train_FuelSegment_X, self.train_FuelSegment_Y, self.column_functions)
-
+        print("Finished training.")
+        
+        print("Starting validation evaluation...")
         evaluation = self.evaluate(
             self.loaded_config["model"],
         )
+        print("Finished validation evaluation.")
 
-        with open(f"../../results/{run_name}/config.json", 'w') as fp:
+        with open(f"../../results/{self.run_name}/config.json", 'w') as fp:
             json.dump(config, fp, indent=4)
-        with open(f"../../results/{run_name}/evaluation.json", 'w') as fp:
+        with open(f"../../results/{self.run_name}/evaluation.json", 'w') as fp:
             json.dump(evaluation, fp, indent=4)
 
         return model, evaluation
@@ -161,20 +162,31 @@ class PrcChallenge(object):
         y_true = self.valid_FuelSegment_Y
         metrics["rmse(valid)"] = root_mean_squared_error(y_pred=y_pred, y_true=y_true)
 
+        # Building submission file
+        print("Starting submission file creation...")
+        self.build_submission_with_trained_model()
+        print("Finished submission file creation.")
+
         return metrics
 
-    def build_submission(
-        self, 
-        model, 
-        ranking_dataframe: pd.DataFrame
-    ) -> pd.DataFrame:
-        assert set(ranking_dataframe.columns) == {
-            "idx",
-            "flight_id",
-            "start",
-            "end",
-            "fuel_kg",
-        }
-        ranking_x = ranking_dataframe.drop(columns=["fuel_kg"])
-        y_pred = model.predict(ranking_x)
-        return ranking_x.assign(fuel_kg=y_pred)
+    def build_submission_with_trained_model(self) -> pd.DataFrame:
+        
+        FuelSegment = get_FuelSegment(variant="rank")
+        FlightList = get_FlightList(variant="rank")
+        Airport = get_Airport()
+        Flight = get_Flight(variant="rank")
+
+        FuelSegment_X = FuelSegment.drop(columns=["fuel_kg"])
+
+        for cleaning_step in self.loaded_config["cleaning"]:
+            FuelSegment_X, FlightList, Airport, Flight = cleaning_step(
+                FuelSegment_X, FlightList, Airport, Flight,
+            )
+        for feature_engineering_step in self.loaded_config["feature_engineering"]:
+            FuelSegment_X, _ = feature_engineering_step(
+                FuelSegment_X, None, FlightList, Airport, Flight, self.column_functions,
+            )
+
+        y_pred = self.loaded_config["model"].predict(FuelSegment_X)
+
+        FuelSegment_X.assign(fuel_kg=y_pred).to_parquet(f"../../results/{self.run_name}/submission_with_trained_model.parquet")
