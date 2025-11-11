@@ -7,7 +7,7 @@ class Flight(object):
 
         self.directory = f"~/prc-challenge-2025/data/flights_{variant}"
         filenames = os.listdir(os.path.expanduser(self.directory))
-        self.flight_ids = map(lambda filename: filename.split(".")[0], filenames)
+        self.flight_ids = list(map(lambda filename: filename.split(".")[0], filenames))
 
     def __getitem__(self, flight_id):
         flight = self.load_flight(flight_id)
@@ -17,9 +17,6 @@ class Flight(object):
         filename = f"{flight_id}.parquet"
         asset = pd.read_parquet(os.path.join(self.directory, filename))
         return asset
-    
-    def keys(self):
-        return list(self.flight_ids)
     
 def get_Flight(variant: str) -> Flight:
     """_summary_
