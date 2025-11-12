@@ -1,6 +1,8 @@
 from .LinearRegression_v0_0_0 import LinearRegression_v0_0_0
 from .RawCatboost_v0_0_0 import RawCatboost_v0_0_0
-from .RawHistGradientBoostingRegressor_v0_0_0 import RawHistGradientBoostingRegressor_v0_0_0
+from .Catboost_optuna_v0_0_0 import Catboost_v0_0_0
+
+# from .RawHistGradientBoostingRegressor_v0_0_0 import RawHistGradientBoostingRegressor_v0_0_0
 
 # Dumb baselines
 from .TrainSetMean_v0_0_0 import TrainSetMean_v0_0_0
