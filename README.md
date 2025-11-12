@@ -62,6 +62,17 @@ Ranking based on `fuel_rank_submission.parquet`: file available, with columns `i
 
 The file must be named `<team-name>_v<incremental integer>.parquet` and submitted to our S3 bucket (using Minio: see Accessing the data, above, and [last year's challenge instructions](https://ansperformance.eu/study/data-challenge/dc2024/data.html#using-minio-client)).
 
+To use Minio do the following:
+
+```bash
+brew install minio/stable/mc ## install Minio
+mc alias set dc25 https://s3.opensky-network.org/ ACCESS_KEY SECRET_KEY ## Setup access
+
+mc cp outspoken-tornado_v@.parquet dc25/prc-2025-outspoken-tornado/ ## submit
+mc ls dc25/prc-2025-outspoken-tornado ## list all submissions
+mc cp --recursive dc25/prc-2025-outspoken-tornado prc-2025-outspoken-tornado_submissions ## download all submissions
+```
+
 ### Phase 2
 
 Ranking based on `fuel_final_submission.parquet` (not yet available).
@@ -75,3 +86,4 @@ Euranova team: outspoken-tornado
 ## Phase 1 submissions
 
 1. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (20 iter), trained on 70% of the train set - score: 277.1618
+2. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (100 iter), trained on 100% of the train set - score: 256.2298
