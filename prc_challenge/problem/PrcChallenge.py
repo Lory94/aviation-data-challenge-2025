@@ -16,7 +16,8 @@ class PrcChallenge(object):
 
     def __init__(
         self,
-        seed: int,
+        seed: int=1,
+        train_frac: float=0.8,
     ):
 
         FuelSegment = get_FuelSegment(variant="train")
@@ -30,9 +31,9 @@ class PrcChallenge(object):
             train_FuelSegment,
             valid_FuelSegment,
         ) = split_train_val(
-            train_frac=0.8,
-            flightlist=FlightList,
-            fuel=FuelSegment,
+            train_frac=train_frac, 
+            flightlist=FlightList, 
+            fuel=FuelSegment, 
             seed=seed,
         )
         self.seed = seed
