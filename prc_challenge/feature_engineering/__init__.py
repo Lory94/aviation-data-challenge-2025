@@ -2,3 +2,4 @@ from .AddAircraftType_v0_0_0 import AddAircraftType_v0_0_0
 from .DropIfExists_v0_0_0 import DropIfExists_v0_0_0
 from .AddFuelSegmentDuration_v0_0_0 import AddFuelSegmentDuration_v0_0_0
 from .AddTimeSinceTakeOff_v0_0_0 import AddTimeSinceTakeOff_v0_0_0
+from .AddTrajectoryFeatures_v0_0_0 import AddTrajectoryFeatures_v0_0_0
