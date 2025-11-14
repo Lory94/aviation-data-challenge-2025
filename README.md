@@ -75,7 +75,7 @@ mc cp --recursive dc25/prc-2025-outspoken-tornado prc-2025-outspoken-tornado_sub
 
 ### Phase 2
 
-Ranking based on `fuel_final_submission.parquet` (not yet available).
+Ranking based on `fuel_final_submission.parquet` (**one** submission allowed).
 
 # Architecture of the repo
 
