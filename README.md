@@ -86,4 +86,5 @@ Euranova team: outspoken-tornado
 ## Phase 1 submissions
 
 1. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (20 iter), trained on 70% of the train set - score: 277.1618
-2. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (100 iter), trained on 100% of the train set - score: 256.2298
+2. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (100 iter), trained on 100% of the train set (80/20 split) - score: 256.2298
+3. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (150 iter), trained on 100% of the train set (99/1 split) - score: 246.4086
