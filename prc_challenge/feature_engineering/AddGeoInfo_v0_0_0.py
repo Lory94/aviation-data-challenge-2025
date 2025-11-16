@@ -62,19 +62,19 @@ class AddGeoInfo_v0_0_0(BaseFeatureEngineering):
         agg_dict = {}
 
         if "mean_altitude[ft]" in self.method:
-            agg_dict["mean_altitude[ft]"] = ("altitude", lambda x: x.mean() if len(x) > 1 else 0.0)
+            agg_dict["mean_altitude[ft]"] = ("altitude", "mean")
         if "range_altitude[ft]" in self.method:
             agg_dict["range_altitude[ft]"] = ("altitude", lambda x: x.max() - x.min() if len(x) > 1 else 0.0)
         if "delta_altitude[ft]" in self.method:
             agg_dict["delta_altitude[ft]"] = ("altitude", lambda x: x.iloc[-1] - x.iloc[0] if len(x) > 1 else 0.0)
         if "mean_TAS[kt]" in self.method:
-            agg_dict["mean_TAS[kt]"] = ("TAS", lambda x: x.mean() if len(x) > 1 else 0.0)
+            agg_dict["mean_TAS[kt]"] = ("TAS", "mean")
         if "max_TAS[kt]" in self.method:
-            agg_dict["max_TAS[kt]"] = ("TAS", lambda x: x.max() if len(x) > 1 else 0.0)
+            agg_dict["max_TAS[kt]"] = ("TAS", "max")
         if "mean_groundspeed[kt]" in self.method:
-            agg_dict["mean_groundspeed[kt]"] = ("groundspeed", lambda x: x.mean() if len(x) > 1 else 0.0)
+            agg_dict["mean_groundspeed[kt]"] = ("groundspeed", "mean")
         if "mean_vertical_rate[ft/min]" in self.method:
-            agg_dict["mean_vertical_rate[ft/min]"] = ("vertical_rate", lambda x: x.mean() if len(x) > 1 else 0.0)
+            agg_dict["mean_vertical_rate[ft/min]"] = ("vertical_rate", "mean")
         if "n_points" in self.method:
             agg_dict["n_points"] = ("altitude", "count")
 
