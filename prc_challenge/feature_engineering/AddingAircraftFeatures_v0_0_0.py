@@ -49,6 +49,14 @@ class AddingAircraftFeatures(BaseFeatureEngineering):
             
             # Flatten the parameters into a single dictionary.
             flat_params = flatten_aircraft_params(ac_params)
+      
+            #Removing useless features
+            flat_params = {
+                key: value
+                for key, value in flat_params.items()
+                if not key.startswith("engine_") and not key.startswith("clean_")
+            }
+        
             
             # Standardize the keys for consistency and the merge operation:
             # Set the join key.
@@ -72,6 +80,8 @@ class AddingAircraftFeatures(BaseFeatureEngineering):
             on="aircraft_type",
             how="left"
         )
+
+
         
         return FuelSegment_X, column_functions
 
@@ -118,25 +128,25 @@ def flatten_aircraft_params(params: Dict[str, Any]) -> Dict[str, Union[str, floa
 
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#     # --- Execution Example ---
-#     FLIGHT_LIST_PATH = '~/prc-challenge-2025/data/flightlist_train.parquet'
-#     # FLIGHT_LIST_PATH = '../../../DB/flightlist_train.parquet'
+    # --- Execution Example ---
+    FLIGHT_LIST_PATH = '~/prc-challenge-2025/data/flightlist_train.parquet'
+    FLIGHT_LIST_PATH = '../../../DB/flightlist_train.parquet'
 
-#     Flightlist = pd.read_parquet(FLIGHT_LIST_PATH)
+    Flightlist = pd.read_parquet(FLIGHT_LIST_PATH)
 
-#     FuelSegment_X_path = '~/prc-challenge-2025/data/flights_train/prc770835414.parquet'
-#     # FuelSegment_X_path = '../../../DB/flights_train/prc770835414.parquet'
-#     FuelSegment_X = pd.read_parquet(FuelSegment_X_path)
-#     df_feats_added, _ = AddingAircraftFeatures.__call__("",FuelSegment_X, pd.DataFrame, Flightlist, "airport", "flight", "")
+    FuelSegment_X_path = '~/prc-challenge-2025/data/flights_train/prc770835414.parquet'
+    FuelSegment_X_path = '../../../DB/flights_train/prc770835414.parquet'
+    FuelSegment_X = pd.read_parquet(FuelSegment_X_path)
+    df_feats_added, _ = AddingAircraftFeatures.__call__("",FuelSegment_X, pd.DataFrame, Flightlist, "airport", "flight", "")
 
 
-#     # Display the first few rows, showing the features in chunks of 5 columns.
-#     print("--- Enriched DataFrame Head (Pandas) ---")
-#     for i in range(0, len(df_feats_added.columns), 5):
-#         # Use iloc for slicing columns
-#         print(df_feats_added.iloc[:, i:i+5].head())
+    # Display the first few rows, showing the features in chunks of 5 columns.
+    print("--- Enriched DataFrame Head (Pandas) ---")
+    for i in range(0, len(df_feats_added.columns), 5):
+        # Use iloc for slicing columns
+        print(df_feats_added.iloc[:, i:i+5].head())
     
 
 

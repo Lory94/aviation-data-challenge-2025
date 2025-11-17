@@ -6,3 +6,4 @@ from .AddTrajectoryFeatures_v0_0_0 import AddTrajectoryFeatures_v0_0_0
 from .AddTrajectoryFeatures_v0_0_1 import AddTrajectoryFeatures_v0_0_1
 from .DropIfExists_v0_0_0 import DropIfExists_v0_0_0
 from .TemporalFeatures import TemporalFeatures
+from .AddingAircraftFeatures import AddingAircraftFeatures
