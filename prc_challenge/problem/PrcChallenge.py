@@ -113,11 +113,13 @@ class PrcChallenge(object):
                 )
             (
                 self.train_FuelSegment_X,
+                self.train_FuelSegment_Y,
                 self.train_FlightList,
                 self.Airport,
                 self.Flight,
             ) = cleaning_step(
                 self.train_FuelSegment_X,
+                self.train_FuelSegment_Y,
                 self.train_FlightList,
                 self.Airport,
                 self.Flight,
@@ -176,11 +178,13 @@ class PrcChallenge(object):
         for cleaning_step in self.loaded_config["cleaning"]:
             (
                 self.valid_FuelSegment_X,
+                _,
                 self.valid_FlightList,
                 self.Airport,
                 self.Flight,
             ) = cleaning_step(
                 self.valid_FuelSegment_X,
+                None,
                 self.valid_FlightList,
                 self.Airport,
                 self.Flight,
@@ -215,8 +219,9 @@ class PrcChallenge(object):
         FuelSegment_X = FuelSegment.drop(columns=["fuel_kg"])
 
         for cleaning_step in self.loaded_config["cleaning"]:
-            FuelSegment_X, FlightList, Airport, Flight = cleaning_step(
+            FuelSegment_X, _, FlightList, Airport, Flight = cleaning_step(
                 FuelSegment_X,
+                None,
                 FlightList,
                 Airport,
                 Flight,
