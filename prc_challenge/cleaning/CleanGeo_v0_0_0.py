@@ -17,7 +17,6 @@ class CleanGeo_v0_0_0(BaseCleaning):
         Airport,
         Flight,
     ):
-        print(Flight.directory)
         if 'clean' not in str(Flight.directory):
             output_dir = Flight.directory + '_clean'
         else:
