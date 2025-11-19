@@ -85,10 +85,12 @@ Euranova team: outspoken-tornado
 
 ## Phase 1 submissions
 
-1. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (20 iter), trained on 70% of the train set - score: 277.1618
-2. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (100 iter), trained on 100% of the train set (80/20 split) - score: 256.2298
-3. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (150 iter), trained on 100% of the train set (99/1 split) - score: 246.4086
-4. Thomas: avg trajectory features + distance features, CatBoost, fine-tuning by Optuna, trained on 100% of the train set (80/20 split) - score: 264.1956
-5. Thomas: avg trajectory features + distance features, CatBoost, fine-tuning by Optuna, trained on 100% of the train set (99/1 split) - score: 253.3667
-6. ? - score: 245.8032
-7. Thomas: fixed trajectory features + fixed time since takeoff, CatBoost+Optuna, 99/1 split - score: 227.2324
+Sub version | Description | Score
+---|---|---
+1 | Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (20 iter), trained on 70% of the train set | 277.1618
+2 | Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (100 iter), trained on 100% of the train set (80/20 split) | 256.2298
+3 | Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (150 iter), trained on 100% of the train set (99/1 split) | 246.4086
+4 | Thomas: avg trajectory features + distance features, CatBoost, fine-tuning by Optuna, trained on 100% of the train set (80/20 split) | 264.1956
+5 | Thomas: avg trajectory features + distance features, CatBoost, fine-tuning by Optuna, trained on 100% of the train set (99/1 split) | 253.3667
+6 | ? | 245.8032
+7 | Thomas: fixed trajectory features + fixed time since takeoff, CatBoost+Optuna, 99/1 split | 227.2324
