@@ -21,6 +21,9 @@ class CleanGeo_v0_0_0(BaseCleaning):
             output_dir = Flight.directory + '_clean'
         else:
             output_dir = Flight.directory
+        # Create the dir if it doesn't exist to prevent OSErrors
+        os.makedirs(output_dir, exist_ok=True)
+
         for flight_id in tqdm(Flight.flight_ids):
             file_path = Path(f"{output_dir}/{flight_id}.parquet").expanduser()
             if file_path.exists():
