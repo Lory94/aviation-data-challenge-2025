@@ -1,0 +1,62 @@
+{
+    "cleaning": [
+        [
+            "CleanGeo_v0_0_0",
+            {}
+        ]
+    ],
+    "feature_engineering": [
+        [
+            "AddAircraftType_v0_0_0",
+            {}
+        ],
+        [
+            "AddingAircraftFeatures",
+            {}
+        ],
+        [
+            "AddFuelSegmentDuration_v0_0_0",
+            {}
+        ],
+        [
+            "AddTimeSinceTakeOff_fromFlightList_v0_0_0",
+            {}
+        ],
+        [
+            "TemporalFeatures",
+            {}
+        ],
+        [
+            "AddGeoInfo_v0_0_0",
+            {
+                "method": [
+                    "mean_altitude[ft]",
+                    "range_altitude[ft]",
+                    "delta_altitude[ft]",
+                    "mean_TAS[kt]",
+                    "max_TAS[kt]",
+                    "mean_groundspeed[kt]",
+                    "mean_vertical_rate[ft/min]",
+                    "n_points"
+                ]
+            }
+        ],
+        [
+            "AddTrajectoryFeatures_v0_0_1",
+            {}
+        ],
+        [
+            "DropIfExists_v0_0_0",
+            {
+                "columns": [
+                    "idx",
+                    "flight_id"
+                ]
+            }
+        ]
+    ],
+    "model": [
+        "Catboost_v0_0_0",
+        {}
+    ]
+}
