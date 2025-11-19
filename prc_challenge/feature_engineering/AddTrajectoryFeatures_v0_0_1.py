@@ -41,11 +41,12 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
         init_features_cols = [
             # altitude [ft] at the start of the fuel segment
             "init_altitude",
-            # distance from the origin airport at the start of the fuel segment
-            # (cumulative sum of the distances between every trajectory point, including
-            # distance from origin to the first trajectory point)
+            # distance from the origin/destination airport at the start of the fuel
+            # segment (not cumulative: depends too much on the data quality)
             "init_distance_origin",
+            "init_distance_destination",
             # initial position of the fuel segment, as a fraction of the total flight
+            # (computed as origin-current-destination)
             "init_position_fraction",
         ]
         all_new_cols = agg_features_cols + delta_features_cols + init_features_cols
@@ -70,7 +71,7 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
             f"Processing trajectory features for {len(unique_flight_ids)} unique flights..."
         )
 
-        for fid in tqdm(unique_flight_ids):
+        for fid in tqdm(unique_flight_ids[:5]):
             try:
                 # LOAD TRAJECTORY: Use the Flight class __getitem__ method
                 # This loads the specific parquet file for this flight_id
@@ -106,36 +107,7 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
             if filtered_traj.empty:
                 continue
 
-            # 4.b. Compute distances on the trajectory
             FlightList_row = FlightList[FlightList["flight_id"] == fid]
-
-            # Distance between each point, from coordinates
-            try:
-                filtered_traj["dist_from_prev[ft]"] = filtered_traj.assign(
-                    lat_shift=lambda df: df.latitude.shift(1),
-                    long_shift=lambda df: df.longitude.shift(1),
-                ).apply(
-                    lambda row: hv_distance(
-                        row.latitude, row.longitude, row.lat_shift, row.long_shift
-                    ),
-                    axis=1,
-                )
-            except ValueError as exc:
-                print(f"Cannot compute distances for flight_id {fid}: {exc}")
-                filtered_traj["dist_from_prev[ft]"] = np.nan
-
-            # First point distance is from airport (required if takeoff is missing)
-            idx = filtered_traj.index[0]
-            filtered_traj.loc[idx, "dist_from_prev[ft]"] = hv_distance(
-                FlightList_row["origin_latitude"].iloc[0],
-                FlightList_row["origin_longitude"].iloc[0],
-                filtered_traj["latitude"].iloc[0],
-                filtered_traj["longitude"].iloc[0],
-            )
-
-            filtered_traj["cumulative_dist[ft]"] = filtered_traj[
-                "dist_from_prev[ft]"
-            ].cumsum()
 
             # 5. Aggregation (Per Flight)
             filtered_traj.sort_values(
@@ -170,28 +142,30 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
             # 5.c. Init Features
             init_features = pd.DataFrame(index=agg_features.index)
             init_features["init_altitude"] = first_points["altitude"]
-            init_features["init_distance_origin"] = first_points["cumulative_dist[ft]"]
-
-            flight_length = hv_distance(
-                FlightList_row["origin_latitude"].iloc[0],
-                FlightList_row["origin_longitude"].iloc[0],
-                FlightList_row["destination_latitude"].iloc[0],
-                FlightList_row["destination_longitude"].iloc[0],
-            )
-            if flight_length < 1:
-                flight_length = 1
-                print(f"Flight length too small for flight_id {fid}, setting to 1")
-
-            init_features["init_position_fraction"] = first_points.apply(
+            init_features["init_distance_origin"] = first_points.apply(
                 lambda row: hv_distance(
                     FlightList_row["origin_latitude"].iloc[0],
                     FlightList_row["origin_longitude"].iloc[0],
                     row["latitude"],
                     row["longitude"],
-                )
-                / flight_length,
+                ),
                 axis=1,
-            ).clip(0, 1)
+            )
+            init_features["init_distance_destination"] = first_points.apply(
+                lambda row: hv_distance(
+                    row["latitude"],
+                    row["longitude"],
+                    FlightList_row["destination_latitude"].iloc[0],
+                    FlightList_row["destination_longitude"].iloc[0],
+                ),
+                axis=1,
+            )
+            init_features["init_position_fraction"] = init_features[
+                "init_distance_origin"
+            ] / (
+                init_features["init_distance_origin"]
+                + init_features["init_distance_destination"]
+            )
 
             # 5.d. Combine for this flight and add to list
             combined_flight_features = pd.concat(
@@ -228,5 +202,7 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
         if "numerical" not in column_functions:
             column_functions["numerical"] = []
         column_functions["numerical"].extend(all_new_cols)
+
+        print(FuelSegment_X.iloc[:5])
 
         return FuelSegment_X, column_functions
