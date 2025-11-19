@@ -71,7 +71,7 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
             f"Processing trajectory features for {len(unique_flight_ids)} unique flights..."
         )
 
-        for fid in tqdm(unique_flight_ids[:5]):
+        for fid in tqdm(unique_flight_ids):
             try:
                 # LOAD TRAJECTORY: Use the Flight class __getitem__ method
                 # This loads the specific parquet file for this flight_id
@@ -202,7 +202,5 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
         if "numerical" not in column_functions:
             column_functions["numerical"] = []
         column_functions["numerical"].extend(all_new_cols)
-
-        print(FuelSegment_X.iloc[:5])
 
         return FuelSegment_X, column_functions
