@@ -90,3 +90,5 @@ Euranova team: outspoken-tornado
 3. Thibault: avg trajectory features, CatBoost, fine-tuning by Optuna (150 iter), trained on 100% of the train set (99/1 split) - score: 246.4086
 4. Thomas: avg trajectory features + distance features, CatBoost, fine-tuning by Optuna, trained on 100% of the train set (80/20 split) - score: 264.1956
 5. Thomas: avg trajectory features + distance features, CatBoost, fine-tuning by Optuna, trained on 100% of the train set (99/1 split) - score: 253.3667
+6. ? - score: 245.8032
+7. Thomas: fixed trajectory features + fixed time since takeoff, CatBoost+Optuna, 99/1 split - score: 227.2324
