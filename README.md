@@ -96,6 +96,6 @@ Sub version | Description | Score
 5 | Thomas: avg trajectory features + distance features, CatBoost, fine-tuning by Optuna, trained on 100% of the train set (99/1 split) | 253.3667
 6 | ? | 245.8032
 7 | Thomas: fixed trajectory features + fixed time since takeoff, CatBoost+Optuna, 99/1 split | 227.2324
-8 | ? | 231.3615
+8 | Thomas: 7 without GeoFeatures, CatBoost+Optuna, 99/1 split | 231.3615
 9 | Thibault: same config as 7, TabDPT, trained on 100% of the train set (99/1 split) | 230.3649
 10 | Lucas: same config as 7 + openAP predictions on 100% of the train set (99/1 split) with 1 Optuna's trial | 237.666
