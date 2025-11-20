@@ -98,3 +98,4 @@ Sub version | Description | Score
 7 | Thomas: fixed trajectory features + fixed time since takeoff, CatBoost+Optuna, 99/1 split | 227.2324
 8 | ? | 231.3615
 9 | Thibault: same config as 7, TabDPT, trained on 100% of the train set (99/1 split) | 230.3649
+10 | Lucas: same config as 7 + openAP predictions on 100% of the train set (99/1 split) with 1 Optuna's trial | 237.666
