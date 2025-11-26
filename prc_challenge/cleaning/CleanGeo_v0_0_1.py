@@ -10,9 +10,9 @@ from geopy.distance import geodesic
 from .BaseCleaning import BaseCleaning
 
 
-class CleanGeo_v0_0_0(BaseCleaning):
+class CleanGeo_v0_0_1(BaseCleaning):
 
-    def __init__(self, save: bool = True):
+    def __init__(self, save: bool = False):
         self.method = None
         self.save = save
 
@@ -54,8 +54,17 @@ class CleanGeo_v0_0_0(BaseCleaning):
                 & (traj["altitude"] <= 60000)
                 & (traj["latitude"].between(-90, 90))
                 & (traj["longitude"].between(-180, 180))
+                & (traj["vertical_rate"].between(-6000, 6000))
             )
             traj = traj[condition]
+
+            traj['latitude_prev'] = traj['latitude'].shift(1)
+            traj['longitude_prev'] = traj['longitude'].shift(1)
+            traj['timestamp_prev'] = traj['timestamp'].shift(1)
+            traj['speed_kmh'] = traj.apply(compute_speed, axis=1)
+
+            traj = traj[(traj['speed_kmh'].isna()) | (traj['speed_kmh'] < 1300)]
+
 
             traj["time_bin"] = (
                 traj["timestamp"].astype("int64") // 5_000_000_000
@@ -98,3 +107,17 @@ class CleanGeo_v0_0_0(BaseCleaning):
 
         Flight.directory = output_dir
         return FuelSegment_X, FuelSegment_Y, FlightList, Airport, Flight
+
+
+def compute_speed(row):
+    if pd.isnull(row['latitude']) or pd.isnull(row['latitude_prev']):
+        return np.nan
+    dist_km = geodesic(
+        (row['latitude_prev'], row['longitude_prev']),
+        (row['latitude'], row['longitude'])
+    ).km
+    time_diff_sec = (row['timestamp'] - row['timestamp_prev']).total_seconds()
+    if time_diff_sec == 0:
+        return np.nan
+    return dist_km / (time_diff_sec / 3600)
+
