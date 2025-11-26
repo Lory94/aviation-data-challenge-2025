@@ -22,7 +22,7 @@ class AddAirline_v0_0_0(BaseFeatureEngineering):
             / "airline_per_flight_flightradar.csv"
         )
         airlines = pd.read_csv(csv_path, usecols=("flight_id", "airline"))
-        FuelSegment_X = FuelSegment_X.merge(airlines, on="flight_id")
+        FuelSegment_X = FuelSegment_X.merge(airlines, on="flight_id", how="left")
         column_functions["categorical"].append("airline")
 
         return FuelSegment_X, column_functions
