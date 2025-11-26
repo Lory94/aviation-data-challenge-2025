@@ -3,7 +3,7 @@ name = "prc-challenge-2025"
 version = "0.1.0"
 description = "ENX's contribution to EC's 2025 challenge"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "==3.13.*"
 dependencies = [
     "catboost>=1.2.8",
     "duckdb>=1.4.1",
