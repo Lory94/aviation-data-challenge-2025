@@ -1358,6 +1358,7 @@ dependencies = [
     { name = "pandas" },
     { name = "skore" },
     { name = "skrub" },
+    { name = "tqdm" },
 ]
 
 [package.dev-dependencies]
@@ -1381,6 +1382,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "skore", specifier = ">=0.11.1" },
     { name = "skrub", specifier = ">=0.6.2" },
+    { name = "tqdm", specifier = ">=4.67.1" },
 ]
 
 [package.metadata.requires-dev]
