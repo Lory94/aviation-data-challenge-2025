@@ -5,6 +5,7 @@ description = "ENX's contribution to EC's 2025 challenge"
 readme = "README.md"
 requires-python = "==3.13.*"
 dependencies = [
+    "airports-py>=2.0.0",
     "catboost>=1.2.8",
     "duckdb>=1.4.1",
     "fastparquet>=2024.11.0",

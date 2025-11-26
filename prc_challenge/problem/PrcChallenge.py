@@ -77,6 +77,14 @@ class PrcChallenge(object):
                 )(**approach[1])
                 for approach in config["feature_engineering"]
             ],
+            "post_cleaning": [
+                load_object_in_file(
+                    file_path="../post_cleaning/__init__.py",
+                    namespace="post_cleaning",
+                    object_name=approach[0],
+                )(**approach[1])
+                for approach in config["post_cleaning"]
+            ],
             "model": load_object_in_file(
                 file_path="../model/__init__.py",
                 namespace="model",
@@ -216,6 +224,9 @@ class PrcChallenge(object):
         Airport = get_Airport()
         Flight = get_Flight(variant="rank")
 
+        FuelSegment_train = get_FuelSegment(variant="train")
+        FlightList_train = get_FlightList(variant="train")
+        
         FuelSegment_X = FuelSegment.drop(columns=["fuel_kg"])
 
         for cleaning_step in self.loaded_config["cleaning"]:
@@ -237,6 +248,15 @@ class PrcChallenge(object):
             )
 
         y_pred = self.loaded_config["model"].predict(FuelSegment_X)
+
+        FuelSegment_X["y_pred"] = y_pred
+        for post_cleaning_step in self.loaded_config["post_cleaning"]:
+            FuelSegment_X["y_pred"] = post_cleaning_step(
+                FuelSegment_train,
+                FlightList_train,
+                FuelSegment_X
+            )
+        y_pred = FuelSegment_X["y_pred"]
 
         FuelSegment.drop(columns=["fuel_kg"]).assign(fuel_kg=y_pred).to_parquet(
             f"../../results/{self.run_name}/submission_with_trained_model.parquet"

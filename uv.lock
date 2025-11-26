@@ -3,6 +3,15 @@ revision = 1
 requires-python = "==3.13.*"
 
 [[package]]
+name = "airports-py"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7f/f2/ea21b2236bd0aa637f763b5f1b667e60fb0a86a8e30aed7f4ad9670fa83f/airports_py-2.0.0.tar.gz", hash = "sha256:122e85733da33b09034d22b300638956272b3f94e29f45731880a40c81635f7f", size = 1257043 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e7/24/92c11288d76f1317e32bedd04d2ade2ac721ccee17676546583732022c9e/airports_py-2.0.0-py3-none-any.whl", hash = "sha256:f71bb9820da915e135636354d380135ad858a3715fd1ec37832a3c30a61c33d8", size = 1274695 },
+]
+
+[[package]]
 name = "alembic"
 version = "1.17.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1365,6 +1374,7 @@ name = "prc-challenge-2025"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "airports-py" },
     { name = "catboost" },
     { name = "duckdb" },
     { name = "fastparquet" },
@@ -1391,6 +1401,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "airports-py", specifier = ">=2.0.0" },
     { name = "catboost", specifier = ">=1.2.8" },
     { name = "duckdb", specifier = ">=1.4.1" },
     { name = "fastparquet", specifier = ">=2024.11.0" },
