@@ -82,7 +82,15 @@ class AddingAircraftFeatures(BaseFeatureEngineering):
         )
 
 
-        
+        cat_features = ['aircraft', 'flaps_type', 'fuel_engine', 'fuel_aircraft']
+        for param in df_params_map.columns:
+            if param =='aircraft_type':
+                continue
+            if param in cat_features:
+                column_functions["categorical"].append(param)
+            else:
+                column_functions["numerical"].append(param)
+
         return FuelSegment_X, column_functions
 
 
