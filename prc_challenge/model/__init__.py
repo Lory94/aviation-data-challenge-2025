@@ -4,6 +4,7 @@ from .RawCatboost_v0_0_0 import RawCatboost_v0_0_0
 
 # Meta models
 from .TrainOnFuelConsumptionPerSec_v0_0_0 import TrainOnFuelConsumptionPerSec_v0_0_0
+from .AverageEnsemble_v0_0_0 import AverageEnsemble_v0_0_0
 
 # Dumb baselines
 from .TrainSetMean_v0_0_0 import TrainSetMean_v0_0_0
