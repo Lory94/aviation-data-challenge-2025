@@ -104,3 +104,4 @@ Sub version | Description | Score
 13 | ? | 225.0856
 14 | ? | 247.8558
 15 | Mathilde: GeoInfo_v0_0_2 (80/20 split) with 1 Optuna's trial | 235.6303
+16 | Mathilde: GeoInfo_v0_0_3 (80/20 split) with 1 Optuna's trial | 227.332
