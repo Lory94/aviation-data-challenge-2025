@@ -53,10 +53,11 @@ def process_single_flight(flight_id, source_dir, output_dir, save_mode):
 
     # 1. Vectorized Filtering
     condition = (
-        (traj["altitude"].between(0, 60000))
-        & (traj["latitude"].between(-90, 90))
-        & (traj["longitude"].between(-180, 180))
-        & (traj["vertical_rate"].between(-6000, 6000))
+        (traj["altitude"].between(0, 60000) | traj["altitude"].isna())
+        & (traj["latitude"].between(-90, 90) | traj["latitude"].isna())
+        & (traj["longitude"].between(-180, 180) | traj["longitude"].isna())
+        & (traj["vertical_rate"].between(-6000, 6000) | traj["vertical_rate"].isna())
+
     )
     traj = traj[condition].copy()
 
@@ -79,6 +80,7 @@ def process_single_flight(flight_id, source_dir, output_dir, save_mode):
     time_diff = (ts - ts_prev).astype('timedelta64[ms]').astype(float) / 1000.0
     speeds = vectorized_haversine_speed(lat_prev, lon_prev, lat, lon, time_diff)
     speeds[0] = 0 
+    traj['speed'] = speeds
     
     traj = traj[(np.isnan(speeds)) | (speeds < 1300)]
 
@@ -86,15 +88,37 @@ def process_single_flight(flight_id, source_dir, output_dir, save_mode):
         return
 
     # 3. Resample & Interpolate
-    traj.set_index("timestamp", inplace=True)
-    traj_5s = traj.resample("5s").mean()
+    traj["time_bin"] = (
+        traj["timestamp"].astype("int64") // 5_000_000_000
+    )  # 5 seconds in nanoseconds
+    traj = (
+        traj.groupby("time_bin")
+        .agg(
+            {
+                "altitude": "mean",
+                "latitude": "mean",
+                "longitude": "mean",
+                "mach": "mean",
+                "groundspeed": "mean",
+                "vertical_rate": "mean",
+                "TAS": "mean",
+                "timestamp": "mean",
+            }
+        )
+        .reset_index(drop=True)
+    )
 
-    start = traj.index.min()
-    end = traj.index.max()
-    
+    start = traj["timestamp"].min()
+    end = traj["timestamp"].max()
     if pd.notna(start) and pd.notna(end):
         full_range = pd.date_range(start=start, end=end, freq="10s")
-        traj_interp = traj_5s.reindex(full_range)
+        traj_interp = pd.DataFrame(
+            {
+                "timestamp": full_range,
+            }
+        )
+        traj_interp = pd.concat([traj, traj_interp])
+        traj_interp = traj_interp.sort_values("timestamp").set_index("timestamp")
         traj_interp = traj_interp.interpolate(method="time", limit_direction="forward")
         traj_interp.index.name = "timestamp"
         traj_interp = traj_interp.reset_index()
@@ -129,7 +153,7 @@ class CleanGeo_v0_2_0(BaseCleaning):
             Path(output_dir).expanduser().mkdir(exist_ok=True, parents=True)
 
         # n_jobs = max(1, cpu_count() - 1)
-        n_jobs = 50
+        n_jobs = 100
         
         print(f"Processing with {n_jobs} threads...")
         
