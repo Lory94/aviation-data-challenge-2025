@@ -99,3 +99,8 @@ Sub version | Description | Score
 8 | Thomas: 7 without GeoFeatures, CatBoost+Optuna, 99/1 split | 231.3615
 9 | Thibault: same config as 7, TabDPT, trained on 100% of the train set (99/1 split) | 230.3649
 10 | Lucas: same config as 7 + openAP predictions on 100% of the train set (99/1 split) with 1 Optuna's trial | 237.666
+11 | Mathilde: Fix aircraftFeatures, without TrajectoryFeatures, GeoInfo_v0_0_0 (80/20 split) with 1 Optuna's trial | 227.2522
+12 | Mathilde: Fix aircraftFeatures, without TrajectoryFeatures, GeoInfo_v0_0_0 (99/1 split) with 1 Optuna's trial | 237.9804
+13 | ? | 225.0856
+14 | ? | 247.8558
+15 | Mathilde: GeoInfo_v0_0_2 (80/20 split) with 1 Optuna's trial | 235.6303
