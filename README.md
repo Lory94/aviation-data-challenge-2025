@@ -105,3 +105,5 @@ Sub version | Description | Score
 14 | ? | 247.8558
 15 | Mathilde: GeoInfo_v0_0_2 (80/20 split) with 1 Optuna's trial | 235.6303
 16 | Mathilde: GeoInfo_v0_0_3 (80/20 split) with 1 Optuna's trial | 227.332
+17 | ? | 297.8765
+18 | Lucas: config with every feature (Add_geo_info_V3 and cleanGeo_V0) on 100% of the train set (99/1 split) with 160 Optuna's trial (including 40 warm-up trials) | 303.5219
