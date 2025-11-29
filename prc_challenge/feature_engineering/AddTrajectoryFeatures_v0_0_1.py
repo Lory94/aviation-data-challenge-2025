@@ -35,7 +35,7 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
             "max_TAS",
             "mean_groundspeed",
             "mean_vertical_rate",
-            "n_points",
+            #"n_points",
         ]
         delta_features_cols = ["altitude_change", "time_in_interval_s"]
         init_features_cols = [
@@ -123,7 +123,7 @@ class AddTrajectoryFeatures_v0_0_1(BaseFeatureEngineering):
                 max_TAS=("TAS", "max"),
                 mean_groundspeed=("groundspeed", "mean"),
                 mean_vertical_rate=("vertical_rate", "mean"),
-                n_points=("timestamp", "count"),
+                #n_points=("timestamp", "count"),
             )
 
             # 5.b. Delta Features
