@@ -10,6 +10,7 @@ import json
 from typing import Dict
 import types
 from ..data.assets import get_FuelSegment, get_Airport, get_FlightList, get_Flight
+from collections import Counter
 
 
 class PrcChallenge(object):
@@ -109,6 +110,7 @@ class PrcChallenge(object):
         print()
 
         for cleaning_step in self.loaded_config["cleaning"]:
+            print(f"Applying on the data the cleaning {cleaning_step.__class__.__name__}.")
             if not isinstance(cleaning_step, types.FunctionType) and hasattr(
                 cleaning_step, "fit"
             ):
@@ -138,6 +140,7 @@ class PrcChallenge(object):
         print()
 
         for feature_engineering_step in self.loaded_config["feature_engineering"]:
+            print(f"Processing the data with {feature_engineering_step.__class__.__name__}.")
             self.train_FuelSegment_X, self.column_functions = feature_engineering_step(
                 self.train_FuelSegment_X,
                 self.train_FuelSegment_Y,
@@ -146,6 +149,28 @@ class PrcChallenge(object):
                 self.Flight,
                 self.column_functions,
             )
+
+            # Checks
+            declared_columns = []
+            for feature_type, columns in self.column_functions.items():
+                declared_columns += columns
+            ## Checking the last feature engineering step didn't produce a double in column_functions
+            if len(declared_columns) != len(set(declared_columns)):
+                duplicates = [
+                    column_name
+                    for column_name, count in Counter(declared_columns).items()
+                    if count > 1
+                ]
+                raise Exception(f"{feature_engineering_step.__class__.__name__} seems to have added to column_functions some columns which were already there: {duplicates}.")
+            ## Checking the feature engineering step didn't produce a feature not declared in column_functions
+            undeclared_columns = [
+                column_name
+                for column_name in self.train_FuelSegment_X.columns
+                if column_name not in declared_columns
+            ]
+            if len(undeclared_columns) > 0:
+                raise Exception(f"{feature_engineering_step.__class__.__name__} seems to have created a new columns without declaring it in column_functions: {undeclared_columns}")
+ 
 
         print("Available features after feature engineering:")
         print(self.train_FuelSegment_X.dtypes)
