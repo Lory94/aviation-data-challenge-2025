@@ -1,0 +1,36 @@
+{
+    "cleaning": [],
+    "feature_engineering": [
+        [
+            "AddAircraftType_v0_0_0",
+            {}
+        ],
+        [
+            "AddFuelSegmentDuration_v0_0_0",
+            {}
+        ],
+        [
+            "AddTimeSinceTakeOff_v0_0_0",
+            {
+                "method": "first_flight_timestamp"
+            }
+        ],
+        [
+            "DropIfExists_v0_0_0",
+            {
+                "columns": [
+                    "idx",
+                    "flight_id"
+                ]
+            }
+        ],
+        [
+            "TemporalFeatures",
+            {}
+        ]
+    ],
+    "model": [
+        "LinearRegression_v0_0_0",
+        {}
+    ]
+}

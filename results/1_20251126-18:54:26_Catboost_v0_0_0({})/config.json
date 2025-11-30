@@ -1,0 +1,23 @@
+{
+    "cleaning": [],
+    "feature_engineering": [
+        [
+            "AddAircraftType_v0_0_0",
+            {}
+        ],
+        [
+            "AddFuelSegmentDuration_v0_0_0",
+            {}
+        ]
+    ],
+    "post_cleaning": [
+        [
+            "MaximumFuelSec_v0_0_0",
+            {}
+        ]
+    ],
+    "model": [
+        "Catboost_v0_0_0",
+        {}
+    ]
+}
