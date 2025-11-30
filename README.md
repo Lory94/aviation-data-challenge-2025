@@ -53,7 +53,7 @@ to check the options
 
 A submission file can be generated running the notebook : `notebooks/pipeline_run_demo/pipeline_run_demo.ipynb`
 
-In the notebook the desired configuration should be chosen.For each step, cleaning, feature_engineering, post_cleaning and model you can select with steps to run. This is an example of a configuration file:
+In the notebook the desired configuration should be chosen.For each step, cleaning, feature_engineering, post_cleaning and model you can select with steps to run. This is the best performing configuration file:
 
 ```python
 config = {
@@ -74,7 +74,7 @@ config = {
 ```
 Once the notebook is executed, the submission file can be found in `reults/model_name/submission_with_trained_model.parquet`
 
-## Architecture
+## Model Architecture
 
 Our solution is based on 3 steps, and uses Catboost as the predicted model (the hyperparameter tuning is performed with Optuna):
 
