@@ -49,6 +49,50 @@ python scripts/split.py -h
 
 to check the options
 
+## Run the code
+
+A submission file can be generated running the notebook : `notebooks/pipeline_run_demo/pipeline_run_demo.ipynb`
+
+In the notebook the desired configuration should be chosen.For each step, cleaning, feature_engineering, post_cleaning and model you can select with steps to run. This is an example of a configuration file:
+
+```python
+config = {
+    "cleaning": [
+        ["CleanGeo_v0_0_0", {}]
+    ],
+    "feature_engineering": [
+        ["AddAircraftType_v0_0_0", {}],
+        ["AddingAircraftFeatures", {}],
+        ["AddFuelSegmentDuration_v0_0_0", {}],
+        ["AddTimeSinceTakeOff_fromFlightList_v0_0_0", {}],
+        ["TemporalFeatures", {}],
+        ["AddGeoInfo_v0_0_0", {"method":["mean_altitude[ft]", "range_altitude[ft]", "delta_altitude[ft]", "mean_TAS[kt]", "max_TAS[kt]", "mean_groundspeed[kt]", "mean_vertical_rate[ft/min]", "n_points"]}],
+        ["DropIfExists_v0_0_0", {"columns": ["idx", "flight_id"]}],
+    ],
+    "model": ["Catboost_v0_0_0", {}],
+}
+```
+Once the notebook is executed, the submission file can be found in `reults/model_name/submission_with_trained_model.parquet`
+
+## Architecture
+
+Our solution is based on 3 steps, and uses Catboost as the predicted model (the hyperparameter tuning is performed with Optuna):
+
+- cleaning: which removes from the training and rank set outlier values, such as non realistic latitude or longitudes
+
+- feature_engineering: which add different new features to the model:
+    - AddAircraftType_v0_0_0: adds the aircraft type;
+    - AddingAircraftFeatures: adds aircraft type informations such as MTOW and aerodynamic information retrived from openap;
+    - AddFuelSegmentDuration_v0_0_0: adds the segment duration in seconds;
+    - AddTimeSinceTakeOff_fromFlightList_v0_0_0: adds the seconds passed from the take off time;
+    - TemporalFeatures: adds temporal feature information such as the day of the week;
+    - AddGeoInfo_v0_0_0: adds trajectory information such as the mean_altitude or the mean_vertical_rate
+    - DropIfExists_v0_0_0: removes the flight_id from the features of the model.
+
+
+- post_cleaning: which clips the the predictions by setting the maximum consumption per minute to 10% more of the maximum consumption experienced in the training set
+
+
 ## Submission
 
 Competition runs in two phases:
@@ -77,7 +121,6 @@ mc cp --recursive dc25/prc-2025-outspoken-tornado prc-2025-outspoken-tornado_sub
 
 Ranking based on `fuel_final_submission.parquet` (**one** submission allowed).
 
-# Architecture of the repo
 
 # Submissions
 
