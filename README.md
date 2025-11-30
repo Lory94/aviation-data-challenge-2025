@@ -56,21 +56,40 @@ A submission file can be generated running the notebook : `notebooks/pipeline_ru
 In the notebook the desired configuration should be chosen.For each step, cleaning, feature_engineering, post_cleaning and model you can select with steps to run. This is the best performing configuration file:
 
 ```python
-config = {
-    "cleaning": [
-        ["CleanGeo_v0_0_0", {}]
-    ],
-    "feature_engineering": [
-        ["AddAircraftType_v0_0_0", {}],
-        ["AddingAircraftFeatures", {}],
-        ["AddFuelSegmentDuration_v0_0_0", {}],
-        ["AddTimeSinceTakeOff_fromFlightList_v0_0_0", {}],
-        ["TemporalFeatures", {}],
-        ["AddGeoInfo_v0_0_0", {"method":["mean_altitude[ft]", "range_altitude[ft]", "delta_altitude[ft]", "mean_TAS[kt]", "max_TAS[kt]", "mean_groundspeed[kt]", "mean_vertical_rate[ft/min]", "n_points"]}],
-        ["DropIfExists_v0_0_0", {"columns": ["idx", "flight_id"]}],
-    ],
-    "model": ["Catboost_v0_0_0", {}],
-}
+"cleaning": [
+    ["CleanGeo_v0_0_0", {}]
+],
+"feature_engineering": [
+    ["AddAircraftType_v0_0_0", {}],
+    ["AddingAircraftFeatures", {}],
+    ["AddFuelSegmentDuration_v0_0_0", {}],
+    ["AddTimeSinceTakeOff_fromFlightList_v0_0_0", {}],
+    ["TemporalFeatures", {}],
+    ["AddGeoInfo_v0_0_3", {"method":[
+        "mean_altitude[ft]",
+        "max_altitude[ft]", ##
+        "range_altitude[ft]",
+        "delta_altitude[ft]",
+        "mean_TAS[kt]",
+        "max_TAS[kt]",
+        "mean_groundspeed[kt]",
+        "mean_vertical_rate[ft/min]",
+        "n_points",
+        "mean_wind_proxy",
+        "min_wind_proxy",
+        "max_wind_proxy",
+        "mean_acc_TAS",
+        "min_acc_TAS",
+        "max_acc_TAS",
+        "init_altitude", 
+        "init_distance_origin", 
+        "init_distance_destination", 
+        "init_position_fraction" 
+        ]
+        }],
+    ["DropIfExists_v0_0_0", {"columns": ["idx", "flight_id"]}],
+],
+"model": ["Catboost_v0_0_0", {}],
 ```
 Once the notebook is executed, the submission file can be found in `reults/model_name/submission_with_trained_model.parquet`
 
@@ -90,7 +109,7 @@ Our solution is based on 3 steps, and uses Catboost as the predicted model (the 
     - DropIfExists_v0_0_0: removes the flight_id from the features of the model.
 
 
-- post_cleaning: which clips the the predictions by setting the maximum consumption per minute to 10% more of the maximum consumption experienced in the training set
+- post_cleaning: which clips the the predictions by setting the maximum consumption per minute to 10% more of the maximum consumption experienced in the training set for that aircraft and keeps only positive predictions
 
 
 ## Submission
